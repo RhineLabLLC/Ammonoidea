@@ -1,0 +1,15 @@
+package rhinelab.ammonoidea.utils
+
+const val INT = "I"
+const val LONG = "J"
+const val FLOAT = "F"
+const val DOUBLE = "D"
+const val CHAR = "C"
+const val SHORT = "S"
+const val BYTE = "B"
+const val BOOLEAN = "Z"
+const val VOID = "V"
+const val OBJECT = "L"
+const val ARRAY = "["
+const val CLASS = "L"
+const val END = ";"
