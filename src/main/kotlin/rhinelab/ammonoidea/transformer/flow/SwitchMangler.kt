@@ -2,6 +2,8 @@ package rhinelab.ammonoidea.transformer.flow
 
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.*
+import rhinelab.ammonoidea.Bootstrapper.classes
+import rhinelab.ammonoidea.Bootstrapper.debug
 import rhinelab.ammonoidea.transformer.transformer
 import rhinelab.ammonoidea.utils.VariableAllocator
 import rhinelab.ammonoidea.utils.generateRandomString
@@ -12,7 +14,9 @@ import kotlin.math.abs
 
 val random = SecureRandom()
 
+// skid util & self wrote
 val switchMangler = transformer {
+    val tmp = ArrayList<ClassNode>()
     classes.forEach { classNode ->
         classNode.methods.forEach processing@{ node ->
             if (Modifier.isAbstract(node.access) || Modifier.isNative(node.access)) return@processing
@@ -53,7 +57,10 @@ val switchMangler = transformer {
                 }
             }
         }
+
+        tmp.add(classNode)
     }
+    classes = tmp
 }
 
 private fun generateInsnList(value: Int): InsnList {
@@ -93,7 +100,7 @@ private fun generateInsnList(value: Int): InsnList {
 
     when (method) {
         0 -> {
-            methodInstructions.add(LdcInsnNode(generateRandomString(value)))
+            methodInstructions.add(LdcInsnNode(if (!debug) generateRandomString(value) else "0".repeat(value)))
             methodInstructions.add(MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/String", "length", "()I", false))
         }
 

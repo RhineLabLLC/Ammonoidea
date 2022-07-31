@@ -1,8 +1,12 @@
 package rhinelab.ammonoidea.transformer
 
 import org.objectweb.asm.Opcodes
+import org.objectweb.asm.tree.ClassNode
+import rhinelab.ammonoidea.Bootstrapper.classes
 
+// self wrote
 val invisibleCast = transformer {
+    val tmp = ArrayList<ClassNode>()
     classes.forEach {
         it.methods.forEach { methodNode ->
             val insnList = methodNode.instructions
@@ -15,5 +19,8 @@ val invisibleCast = transformer {
                 }
             }
         }
+        tmp.add(it)
     }
+
+    classes = tmp
 }
