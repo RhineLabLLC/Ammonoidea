@@ -155,13 +155,21 @@ private fun splitToLShift(number: Int): IntArray {
 }
 
 private fun generateIntPush(i: Int): AbstractInsnNode? {
-    if (i <= 5 && i >= -1) {
-        return InsnNode(i + 3)
+
+    return when {
+        i <= 5 && i >= -1 -> InsnNode(i + 3)
+        i >= -128 && i <= 127 -> IntInsnNode(Opcodes.BIPUSH, i)
+        i >= -32768 && i <= 32767 -> IntInsnNode(Opcodes.SIPUSH, i)
+        else -> LdcInsnNode(i)
     }
-    if (i >= -128 && i <= 127) {
-        return IntInsnNode(Opcodes.BIPUSH, i)
-    }
-    return if (i >= -32768 && i <= 32767) {
-        IntInsnNode(Opcodes.SIPUSH, i)
-    } else LdcInsnNode(i)
+
+//    if (i <= 5 && i >= -1) {
+//        return InsnNode(i + 3)
+//    }
+//    if (i >= -128 && i <= 127) {
+//        return IntInsnNode(Opcodes.BIPUSH, i)
+//    }
+//    return if (i >= -32768 && i <= 32767) {
+//        IntInsnNode(Opcodes.SIPUSH, i)
+//    } else LdcInsnNode(i)
 }

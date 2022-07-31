@@ -35,12 +35,15 @@ val fakeGoto = transformer {
             for (insn in instructions) {
                 val opcode = insn.opcode
                 if (opcode == GOTO) {
+
+                    insn as JumpInsnNode
+
                     val jList = InsnList()
                     jList.add(FieldInsnNode(GETSTATIC, classNode.name, fieldName, INT))
 
                     val opt = if (fieldValue >= 0) IFGE else IFLT
 
-                    jList.add(JumpInsnNode(opt, (insn as JumpInsnNode).label))
+                    jList.add(JumpInsnNode(opt, insn.label))
                     jList.add(InsnNode(ACONST_NULL))
                     jList.add(InsnNode(ATHROW))
 

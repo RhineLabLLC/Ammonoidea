@@ -7,24 +7,20 @@ import org.objectweb.asm.Opcodes.*;
 import java.lang.reflect.Modifier
 
 
-class VariableAllocator private constructor() {
+class VariableAllocator(method: MethodNode) {
     private var max = 0
     private var argumentSize = 0
 
-    constructor(method: MethodNode) : this() {
+    init {
         if (!Modifier.isStatic(method.access)) registerExisting(0, Type.getType("Ljava/lang/Object;"))
         for (argumentType in Type.getArgumentTypes(method.desc)) {
             registerExisting(argumentType.size + max - 1, argumentType)
         }
         argumentSize = max
+
         for (abstractInsnNode in method.instructions.toArray()) {
             if (abstractInsnNode is VarInsnNode) {
-                getType(abstractInsnNode)?.let {
-                    registerExisting(
-                        abstractInsnNode.`var`,
-                        it
-                    )
-                }
+                registerExisting(abstractInsnNode.`var`, getType(abstractInsnNode))
             }
         }
     }
@@ -46,25 +42,16 @@ class VariableAllocator private constructor() {
     }
 }
 
-private fun getType(insn: VarInsnNode): Type? {
+private val objectType = Type.getObjectType("java/lang/Object")
 
-    val offset: Int = when (insn.opcode) {
-            in ISTORE..ASTORE -> insn.opcode - ISTORE
-            in ILOAD..ALOAD -> insn.opcode - ILOAD
-            RET -> throw UnsupportedOperationException(
-                "RET is not supported"
-            )
+private fun getType(insn: VarInsnNode): Type {
+    return when (insn.opcode) {
+        ILOAD, ISTORE -> Type.INT_TYPE
+        LLOAD, LSTORE -> Type.LONG_TYPE
+        FLOAD, FSTORE -> Type.FLOAT_TYPE
+        DLOAD, DSTORE -> Type.DOUBLE_TYPE
+        ALOAD, ASTORE -> objectType
 
-            else -> throw UnsupportedOperationException()
-        }
-
-    when (offset) {
-        0 -> return Type.INT_TYPE
-        LLOAD - ILOAD -> return Type.LONG_TYPE
-        FLOAD - ILOAD -> return Type.FLOAT_TYPE
-        DLOAD - ILOAD -> return Type.DOUBLE_TYPE
-        ALOAD - ILOAD -> return Type.getType("Ljava/lang/Object;")
+        else -> throw IllegalArgumentException("Unknown variable type: ${insn.`var`}")
     }
-
-    throw IllegalStateException("I dunno this situation")
 }

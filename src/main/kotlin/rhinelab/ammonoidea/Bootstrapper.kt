@@ -18,3 +18,20 @@ fun main(args: Array<String>) {
     if (args.isEmpty()) return
     process(File(args[0]).readBytes())
 }
+
+fun process(byteArray: ByteArray, debug: Boolean = false) {
+    if (debug) Bootstrapper.debug = true
+    val cl = ClassReader(byteArray)
+    var cn = ClassNode()
+    cl.accept(cn, ClassReader.SKIP_DEBUG)
+    classes.add(cn)
+    invokeDynamic.transform()
+//    switchMangler.transform()
+//    fakeGoto.transform()
+    cn = classes.first()
+    val cw = ClassWriter(ClassWriter.COMPUTE_FRAMES)
+    cn.accept(cw)
+    val out = File("out.class")
+    out.createNewFile()
+    out.writeBytes(cw.toByteArray())
+}
