@@ -15,7 +15,6 @@ val fakeGoto = transformer {
     // TODO("Check if field is necessary")
     val tmp = ArrayList<ClassNode>()
     classes.forEach { classNode ->
-        println("Processing FakeGOTO...")
         val fieldName = if (!debug) " ".repeat(randomInt(4, 32)) else generateRandomString(8, "ABCDEF1234567890")
         val fieldValue = randomInt()
 
