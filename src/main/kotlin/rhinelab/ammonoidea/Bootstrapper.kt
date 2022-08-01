@@ -51,11 +51,11 @@ fun processSingleClass(byteArray: ByteArray, debug: Boolean = false) {
     fakeGoto.transform()
     // invisibleCast.transform()
     cn = classes.first()
-    val cw: ClassWriter = if (debug) {
-        ClassWriter(ClassWriter.COMPUTE_MAXS)
-    } else {
-        ClassWriter(ClassWriter.COMPUTE_FRAMES)
-    }
+
+    val cw = ClassWriter(
+        if (debug) ClassWriter.COMPUTE_MAXS else ClassWriter.COMPUTE_FRAMES
+    )
+
     cn.accept(cw)
     val out = File("out.class")
     out.createNewFile()
