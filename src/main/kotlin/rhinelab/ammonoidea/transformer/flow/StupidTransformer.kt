@@ -16,8 +16,9 @@ private class StupidTransformer : MethodVisitor(ASM9) {
     override fun visitJumpInsn(opcode: Int, label: Label) {
         if (opcode == GOTO) return
         val new = Label()
-        visitLabel(new)
+
         super.visitJumpInsn(negate(opcode), new)
+        visitLabel(new)
         super.visitJumpInsn(GOTO, label)
     }
 }

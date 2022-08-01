@@ -1,22 +1,16 @@
 package rhinelab.ammonoidea.transformer
 
 import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.AbstractInsnNode
-import org.objectweb.asm.tree.ClassNode
-import org.objectweb.asm.tree.InsnList
-import org.objectweb.asm.tree.InsnNode
-import org.objectweb.asm.tree.IntInsnNode
-import org.objectweb.asm.tree.LdcInsnNode
+import org.objectweb.asm.tree.*
 import rhinelab.ammonoidea.Bootstrapper.classes
 import rhinelab.ammonoidea.utils.randomInt
-import rhinelab.ammonoidea.utils.randomLong
 
 fun isIntInsn(insn: AbstractInsnNode?): Boolean {
     if (insn == null) return false
     val op = insn.opcode
     return ((op >= Opcodes.ICONST_M1) && (op <= Opcodes.ICONST_5)) ||
-            (op == Opcodes.BIPUSH) || (op == Opcodes.SIPUSH) ||
-            ((insn is LdcInsnNode) && (insn.cst is Int))
+    (op == Opcodes.BIPUSH) || (op == Opcodes.SIPUSH) ||
+    ((insn is LdcInsnNode) && (insn.cst is Int))
 }
 
 fun getIntFromInsn(insn: AbstractInsnNode): Int {
@@ -71,22 +65,24 @@ fun modifyInt(num: Int): InsnList {
 
 val numberBitwise = transformer {
     val tmp = ArrayList<ClassNode>()
-    classes.forEach classProcess@{
-        it.methods.stream().filter { it.instructions != null }.forEach { mn ->
-            val insnList = mn.instructions
+    classes.forEach classProcess@{ classNode ->
+        classNode.methods
+            .filter { it.instructions != null }
+            .forEach { mn ->
+                val insnList = mn.instructions
 
-            insnList.forEach insnProcess@{ insn ->
-                if (isIntInsn(insn)) {
-                    if (getIntFromInsn(insn) < 16) {
-                        return@insnProcess
+                insnList.forEach insnProcess@{ insn ->
+                    if (isIntInsn(insn)) {
+                        if (getIntFromInsn(insn) < 16) {
+                            return@insnProcess
+                        }
+                        val replacement = modifyInt(getIntFromInsn(insn))
+                        insnList.insert(insn, replacement)
+                        insnList.remove(insn)
                     }
-                    val replacement = modifyInt(getIntFromInsn(insn))
-                    insnList.insert(insn, replacement)
-                    insnList.remove(insn)
                 }
             }
-        }
-        tmp.add(it)
+        tmp.add(classNode)
     }
     classes = tmp
 }
