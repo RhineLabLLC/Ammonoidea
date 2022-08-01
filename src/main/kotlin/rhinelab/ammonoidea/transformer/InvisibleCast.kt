@@ -18,6 +18,8 @@ val invisibleCast = transformer {
                     removeIndex.add(index)
                 }
             }
+
+            methodNode.instructions = insnList
         }
         tmp.add(it)
     }

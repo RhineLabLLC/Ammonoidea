@@ -9,6 +9,7 @@ import rhinelab.ammonoidea.Bootstrapper.classes
 import rhinelab.ammonoidea.Bootstrapper.debug
 import rhinelab.ammonoidea.transformer.transformer
 import rhinelab.ammonoidea.utils.generateRandomString
+import rhinelab.ammonoidea.utils.randomInt
 import java.util.concurrent.atomic.AtomicInteger
 
 var key1 = 0
@@ -21,9 +22,9 @@ val invokeDynamic = transformer {
     var hostClass = classes.random()
     var whileCount = 0
 
-    key1 = if (debug) 0 else 0xCAFE
-    key2 = if (debug) 0 else 0xBEEF
-    key3 = if (debug) 0 else 0xDEAD
+    key1 = if (debug) 0 else randomInt()
+    key2 = if (debug) 0 else randomInt()
+    key3 = if (debug) 0 else randomInt()
 
     while (hostClass.superName != "java/lang/Object" || hostClass.access != ACC_PUBLIC or ACC_SUPER || hostClass.version < V1_7) {
         hostClass = classes.random()
@@ -39,7 +40,6 @@ val invokeDynamic = transformer {
         "%为国家哪何曾半日闲空 我也曾征过了塞北西东\"官封到节度使皇王恩重{霎时间身不爽瞌睡朦胧*"
         )
     }
-    hostClass.methods.add(createBootstrap(bsmName, hostClass.name))
     val bsmHandle = Handle(
         H_INVOKESTATIC, hostClass.name, bsmName,
         "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;" +
@@ -90,6 +90,8 @@ val invokeDynamic = transformer {
         }
         tmp.add(classNode)
     }
+
+    hostClass.methods.add(createBootstrap(bsmName, hostClass.name))
     classes = tmp
 }
 
