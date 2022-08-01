@@ -7,6 +7,8 @@ import rhinelab.ammonoidea.Bootstrapper.classes
 import rhinelab.ammonoidea.transformer.flow.fakeGoto
 import rhinelab.ammonoidea.transformer.flow.invokeDynamic
 import rhinelab.ammonoidea.transformer.flow.switchMangler
+import rhinelab.ammonoidea.transformer.invisibleCast
+import rhinelab.ammonoidea.transformer.numberBitwise
 import java.io.File
 
 object Bootstrapper {
@@ -28,6 +30,8 @@ fun process(byteArray: ByteArray, debug: Boolean = false) {
     invokeDynamic.transform()
     switchMangler.transform()
     fakeGoto.transform()
+    numberBitwise.transform()
+    // invisibleCast.transform()
     cn = classes.first()
     val cw = ClassWriter(ClassWriter.COMPUTE_FRAMES)
     cn.accept(cw)

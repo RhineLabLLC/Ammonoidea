@@ -2,6 +2,7 @@ package rhinelab.ammonoidea.transformer
 
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
+import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.InsnNode
 import org.objectweb.asm.tree.IntInsnNode
@@ -69,17 +70,23 @@ fun modifyInt(num: Int): InsnList {
 }
 
 val numberBitwise = transformer {
+    val tmp = ArrayList<ClassNode>()
     classes.forEach classProcess@{
         it.methods.stream().filter { it.instructions != null }.forEach { mn ->
             val insnList = mn.instructions
 
-            insnList.forEach insnProcess@{insn ->
+            insnList.forEach insnProcess@{ insn ->
                 if (isIntInsn(insn)) {
+                    if (getIntFromInsn(insn) < 16) {
+                        return@insnProcess
+                    }
                     val replacement = modifyInt(getIntFromInsn(insn))
                     insnList.insert(insn, replacement)
                     insnList.remove(insn)
                 }
             }
         }
+        tmp.add(it)
     }
+    classes = tmp
 }
