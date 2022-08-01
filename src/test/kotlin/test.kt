@@ -1,6 +1,6 @@
-import rhinelab.ammonoidea.process
+import rhinelab.ammonoidea.processSingleClass
 import java.io.File
 
 fun main() {
-    process(File("IsolatedTest.class").readBytes(), true)
+    processSingleClass(File("IsolatedTest.class").readBytes(), false)
 }

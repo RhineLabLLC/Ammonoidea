@@ -34,14 +34,14 @@ private fun negate(opcode: Int): Int {
         IF_ICMPGE -> IF_ICMPLT
         IF_ICMPGT -> IF_ICMPLE
         IF_ICMPLE -> IF_ICMPGT
-        IFEQ -> IFNE
-        IFNE -> IFEQ
-        IFLT -> IFGE
-        IFGE -> IFLT
-        IFGT -> IFLE
-        IFLE -> IFGT
-        IFNULL -> IFNONNULL
+        IFEQ      -> IFNE
+        IFNE      -> IFEQ
+        IFLT      -> IFGE
+        IFGE      -> IFLT
+        IFGT      -> IFLE
+        IFLE      -> IFGT
+        IFNULL    -> IFNONNULL
         IFNONNULL -> IFNULL
-        else -> throw IllegalArgumentException("Unknown opcode: $opcode")
+        else      -> throw IllegalArgumentException("Unknown opcode: $opcode")
     }
 }
