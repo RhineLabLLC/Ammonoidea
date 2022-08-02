@@ -102,6 +102,12 @@ fun process(inFile: File, outFile: File, debug: Boolean = false) {
 
     JarOutputStream(outFile.outputStream()).use {
         classes.forEach { classNode ->
+            val cw: ClassWriter = if (debug) {
+                ClassWriter(ClassWriter.COMPUTE_MAXS)
+            } else {
+                ClassWriter(ClassWriter.COMPUTE_FRAMES)
+            }
+
             val entry = JarEntry("${classNode.name}.class")
             it.putNextEntry(entry)
             classNode.accept(cw)

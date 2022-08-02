@@ -3,7 +3,6 @@ package rhinelab.ammonoidea.transformer
 import org.objectweb.asm.Handle
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.*
-import rhinelab.ammonoidea.Bootstrapper
 import rhinelab.ammonoidea.Bootstrapper.classes
 import rhinelab.ammonoidea.Bootstrapper.debug
 import rhinelab.ammonoidea.isExcluded
