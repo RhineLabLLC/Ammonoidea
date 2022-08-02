@@ -2,8 +2,10 @@ package rhinelab.ammonoidea.transformer.flow
 
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.tree.*
+import rhinelab.ammonoidea.Bootstrapper
 import rhinelab.ammonoidea.Bootstrapper.classes
 import rhinelab.ammonoidea.Bootstrapper.debug
+import rhinelab.ammonoidea.isExcluded
 import rhinelab.ammonoidea.transformer.transformer
 import rhinelab.ammonoidea.utils.INT
 import rhinelab.ammonoidea.utils.generateRandomString
@@ -15,6 +17,10 @@ val fakeGoto = transformer {
     // TODO("Check if field is necessary")
     val tmp = ArrayList<ClassNode>()
     classes.forEach { classNode ->
+        if (isExcluded(classNode)) {
+            tmp.add(classNode)
+            return@forEach
+        }
         val fieldName = if (!debug) " ".repeat(randomInt(4, 32)) else generateRandomString(8, "ABCDEF1234567890")
         val fieldValue = randomInt()
 

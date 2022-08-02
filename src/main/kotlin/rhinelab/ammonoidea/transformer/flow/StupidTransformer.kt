@@ -3,11 +3,15 @@ package rhinelab.ammonoidea.transformer.flow
 import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes.*
-import rhinelab.ammonoidea.Bootstrapper
+import rhinelab.ammonoidea.Bootstrapper.classes
+import rhinelab.ammonoidea.isExcluded
 import rhinelab.ammonoidea.transformer.transformer
 
 val stupidTransformer = transformer {
-    Bootstrapper.classes.forEach {
+    classes.forEach {
+        if (isExcluded(it)) {
+            return@forEach
+        }
         it.methods.forEach { m -> m.accept(StupidTransformer()) }
     }
 }

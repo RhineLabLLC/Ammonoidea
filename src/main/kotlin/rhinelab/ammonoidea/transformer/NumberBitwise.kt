@@ -3,6 +3,7 @@ package rhinelab.ammonoidea.transformer
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.*
 import rhinelab.ammonoidea.Bootstrapper.classes
+import rhinelab.ammonoidea.isExcluded
 import rhinelab.ammonoidea.utils.randomInt
 import rhinelab.ammonoidea.utils.randomLong
 
@@ -131,6 +132,10 @@ fun modifyLong(num: Long): InsnList {
 val numberBitwise = transformer {
     val tmp = ArrayList<ClassNode>()
     classes.forEach classProcess@{ classNode ->
+        if (isExcluded(classNode)) {
+            tmp.add(classNode)
+            return@classProcess
+        }
         classNode.methods
             .filter { it.instructions != null }
             .forEach { mn ->

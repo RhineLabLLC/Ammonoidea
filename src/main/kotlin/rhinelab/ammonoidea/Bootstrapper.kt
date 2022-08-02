@@ -12,6 +12,7 @@ import rhinelab.ammonoidea.transformer.flow.switchMangler
 import rhinelab.ammonoidea.transformer.numberBitwise
 import java.io.File
 import java.io.FileOutputStream
+import java.lang.reflect.Modifier
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
@@ -71,8 +72,12 @@ fun process(inFile: File, outFile: File, debug: Boolean = false) {
                 val classNode = ClassNode()
 
                 try {
-                    ClassReader(istream).accept(classNode, ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES)
-                    classes.add(classNode)
+                    ClassReader(istream).accept(classNode, ClassReader.SKIP_DEBUG + ClassReader.SKIP_FRAMES)
+                    if (isExcluded(classNode)) {
+                        resources[i.name] = jar.getInputStream(i).readBytes()
+                    } else {
+                        classes.add(classNode)
+                    }
                 } catch (t: Throwable) {
                     println("Error while reading class ${i.realName}: ${t.javaClass.simpleName}")
                     t.printStackTrace()
@@ -93,14 +98,7 @@ fun process(inFile: File, outFile: File, debug: Boolean = false) {
     stupidTransformer.transform()
     fakeGoto.transform()
 
-    val cw: ClassWriter = if (debug) {
-        ClassWriter(ClassWriter.COMPUTE_MAXS)
-    } else {
-        ClassWriter(ClassWriter.COMPUTE_FRAMES)
-    }
-
-    val out = FileOutputStream(outFile).buffered()
-    JarOutputStream(out).use {
+    JarOutputStream(outFile.outputStream()).use {
         classes.forEach { classNode ->
             val entry = JarEntry("${classNode.name}.class")
             it.putNextEntry(entry)
@@ -116,4 +114,9 @@ fun process(inFile: File, outFile: File, debug: Boolean = false) {
             it.closeEntry()
         }
     }
+}
+
+fun isExcluded(classNode: ClassNode): Boolean {
+    if (Modifier.isInterface(classNode.access)) return true
+    return !classNode.name.contains("neptunex")
 }

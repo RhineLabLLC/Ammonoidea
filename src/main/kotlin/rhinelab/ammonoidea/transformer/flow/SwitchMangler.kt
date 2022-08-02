@@ -4,6 +4,7 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.*
 import rhinelab.ammonoidea.Bootstrapper.classes
 import rhinelab.ammonoidea.Bootstrapper.debug
+import rhinelab.ammonoidea.isExcluded
 import rhinelab.ammonoidea.transformer.transformer
 import rhinelab.ammonoidea.utils.VariableAllocator
 import rhinelab.ammonoidea.utils.generateRandomString
@@ -18,6 +19,10 @@ val random = SecureRandom()
 val switchMangler = transformer {
     val tmp = ArrayList<ClassNode>()
     classes.forEach { classNode ->
+        if (isExcluded(classNode)) {
+            tmp.add(classNode)
+            return@forEach
+        }
         classNode.methods.forEach processing@{ node ->
             if (Modifier.isAbstract(node.access) || Modifier.isNative(node.access)) return@processing
 

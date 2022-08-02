@@ -7,6 +7,7 @@ import org.objectweb.asm.Type
 import org.objectweb.asm.tree.*
 import rhinelab.ammonoidea.Bootstrapper.classes
 import rhinelab.ammonoidea.Bootstrapper.debug
+import rhinelab.ammonoidea.isExcluded
 import rhinelab.ammonoidea.transformer.transformer
 import rhinelab.ammonoidea.utils.generateRandomString
 import rhinelab.ammonoidea.utils.randomInt
@@ -19,13 +20,13 @@ var key3 = 0
 val invokeDynamic = transformer {
     val tmp = ArrayList<ClassNode>()
     val counter = AtomicInteger()
-    var hostClass = classes.random()
-    var whileCount = 0
 
     key1 = if (debug) 0 else randomInt()
     key2 = if (debug) 0 else randomInt()
     key3 = if (debug) 0 else randomInt()
 
+    var hostClass = classes.random()
+    var whileCount = 0
     while (hostClass.superName != "java/lang/Object" || hostClass.access != ACC_PUBLIC or ACC_SUPER || hostClass.version < V1_7) {
         hostClass = classes.random()
         whileCount++
@@ -45,8 +46,8 @@ val invokeDynamic = transformer {
         "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;" +
                 "Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false
     )
-    classes.stream().forEach processClass@{ classNode ->
-        if (classNode.superName == "java/lang/Enum" || classNode.version < V1_7) {
+    classes.forEach processClass@{ classNode ->
+        if (classNode.superName == "java/lang/Enum" || classNode.version < V1_7 || isExcluded(classNode)) {
             tmp.add(classNode)
             return@processClass
         }
