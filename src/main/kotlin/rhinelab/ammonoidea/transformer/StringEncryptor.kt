@@ -62,7 +62,7 @@ val stringEncryptor = transformer {
             .forEach {
                 val insnList = it.instructions
                 for (i in insnList) {
-                    if (i is LdcInsnNode && i.cst is String && i.cst != "\u00a7") {
+                    if (i is LdcInsnNode && i.cst is String) {
                         val origin = i.cst as String
                         val key = generateRandomString(12)
                         val encrypted = encrypt(origin, key)
@@ -264,7 +264,15 @@ fun generateDecryptMethod(name: String, keySetterName: String): MethodNode {
     list.add(VarInsnNode(Opcodes.ALOAD, 0))
     list.add(MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/util/Base64\$Decoder", "decode", "(Ljava/lang/String;)[B"))
     list.add(MethodInsnNode(Opcodes.INVOKEVIRTUAL, "javax/crypto/Cipher", "doFinal", "([B)[B"))
-    list.add(MethodInsnNode(Opcodes.INVOKESPECIAL, "java/lang/String", "<init>", "([B)V"))
+    list.add(
+        FieldInsnNode(
+            Opcodes.GETSTATIC,
+            "java/nio/charset/StandardCharsets",
+            "UTF_8",
+            "Ljava/nio/charset/Charset;"
+        )
+    )
+    list.add(MethodInsnNode(Opcodes.INVOKESPECIAL, "java/lang/String", "<init>", "([BLjava/nio/charset/Charset;)V"))
     list.add(exEnd)
     list.add(InsnNode(Opcodes.ARETURN))
     list.add(exHandler)
