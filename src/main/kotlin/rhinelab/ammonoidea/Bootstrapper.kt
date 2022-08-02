@@ -10,6 +10,7 @@ import rhinelab.ammonoidea.transformer.flow.invokeDynamic
 import rhinelab.ammonoidea.transformer.flow.stupidTransformer
 import rhinelab.ammonoidea.transformer.flow.switchMangler
 import rhinelab.ammonoidea.transformer.numberBitwise
+import rhinelab.ammonoidea.transformer.stringEncryptor
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.reflect.Modifier
@@ -94,6 +95,7 @@ fun process(inFile: File, outFile: File, debug: Boolean = false) {
 
     numberBitwise.transform()
     invokeDynamic.transform()
+    stringEncryptor.transform()
     switchMangler.transform()
     stupidTransformer.transform()
     fakeGoto.transform()

@@ -52,6 +52,6 @@ private fun getType(insn: VarInsnNode): Type {
         DLOAD, DSTORE -> Type.DOUBLE_TYPE
         ALOAD, ASTORE -> objectType
 
-        else -> throw IllegalArgumentException("Unknown variable type: ${insn.`var`}")
+        else -> throw IllegalArgumentException("Unknown variable type: ${insn.opcode}")
     }
 }

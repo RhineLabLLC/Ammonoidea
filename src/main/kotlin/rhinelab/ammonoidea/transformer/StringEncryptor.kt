@@ -19,7 +19,7 @@ import kotlin.collections.ArrayList
 
 
 var hostClassName = ""
-var keyVarName = ""
+var keyVarName = if (!debug) "*".repeat(randomInt(4, 32)) else generateRandomString(12, "ABCDEF1234567890")
 
 private var secretKey: SecretKeySpec? = null
 
@@ -41,14 +41,6 @@ val stringEncryptor = transformer {
     }
 
     hostClassName = hostClass.name
-    keyVarName = if (!debug) "\u0000".repeat(randomInt(4, 32)) else generateRandomString(12, "ABCDEF1234567890")
-
-    hostClass.fields.add(
-        FieldNode(
-            Opcodes.ACC_PRIVATE or Opcodes.ACC_STATIC, keyVarName,
-            "Ljavax/crypto/spec/SecretKeySpec;", null, null
-        )
-    )
 
     val keySetterName = generateRandomString(
         8,
@@ -60,38 +52,55 @@ val stringEncryptor = transformer {
         "菊石混淆器=祝您新年快乐阖家幸福|事业蒸蒸日上?生活丰富美满|全家trans\""
     )
 
-    hostClass.methods.add(generateKeySetter(keySetterName))
-    hostClass.methods.add(generateDecryptMethod(decryptorName, keySetterName))
-
     classes.forEach { classNode ->
         if (isExcluded(classNode)) {
             tmp.add(classNode)
             return@forEach
         }
 
-        classNode.methods.stream().filter { it.instructions != null }.forEach {
-            val insnList = it.instructions
-            for (i in insnList) {
-                if (i is LdcInsnNode && i.cst is String) {
-                    val origin = i.cst as String
-                    val key = generateRandomString(12)
-                    val encrypted = encrypt(origin, key)
+        classNode.methods
+            .filter { it.instructions != null }
+            .forEach {
+                val insnList = it.instructions
+                for (i in insnList) {
+                    if (i is LdcInsnNode && i.cst is String && i.cst != "\u00a7") {
+                        val origin = i.cst as String
+                        val key = generateRandomString(12)
+                        val encrypted = encrypt(origin, key)
 
-                    val decList = InsnList()
-                    decList.add(LdcInsnNode(encrypted))
-                    decList.add(LdcInsnNode(key))
-                    decList.add(MethodInsnNode(Opcodes.INVOKESTATIC, hostClassName, decryptorName, "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"))
+                        val decList = InsnList()
+                        decList.add(LdcInsnNode(encrypted))
+                        decList.add(LdcInsnNode(key))
+                        decList.add(
+                            MethodInsnNode(
+                                Opcodes.INVOKESTATIC,
+                                hostClassName,
+                                decryptorName,
+                                "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+                            )
+                        )
 
-                    insnList.insert(i, decList)
-                    insnList.remove(i)
+                        insnList.insert(i, decList)
+                        insnList.remove(i)
+                    }
                 }
-            }
 
-            it.instructions = insnList
-        }
+                it.instructions = insnList
+            }
 
         tmp.add(classNode)
     }
+
+    hostClass.methods.add(generateKeySetter(keySetterName))
+    hostClass.methods.add(generateDecryptMethod(decryptorName, keySetterName))
+
+    hostClass.fields.add(
+        FieldNode(
+            Opcodes.ACC_PRIVATE + Opcodes.ACC_STATIC, keyVarName,
+            "Ljavax/crypto/spec/SecretKeySpec;", null, null
+        )
+    )
+
     classes = tmp
 }
 
@@ -130,12 +139,12 @@ fun generateKeySetter(name: String): MethodNode {
     val exHandler = LabelNode()
     val labelReturn = LabelNode()
 
-    method.tryCatchBlocks.add(TryCatchBlockNode(exStart, exEnd, exHandler, "java/lang/Exception"))
+    method.tryCatchBlocks.add(TryCatchBlockNode(exStart, exEnd, exHandler, "java/security/NoSuchAlgorithmException"))
     list.add(exStart)
     list.add(VarInsnNode(Opcodes.ALOAD, 0))
     // GETSTATIC java/nio/charset/StandardCharsets.UTF_8 Ljava/nio/charset/Charset;
     list.add(
-        MethodInsnNode(
+        FieldInsnNode(
             Opcodes.GETSTATIC,
             "java/nio/charset/StandardCharsets",
             "UTF_8",
@@ -174,7 +183,7 @@ fun generateKeySetter(name: String): MethodNode {
     )
     list.add(VarInsnNode(Opcodes.ASTORE, 2))
     list.add(VarInsnNode(Opcodes.ALOAD, 2))
-    list.add(VarInsnNode(Opcodes.BIPUSH, 16))
+    list.add(IntInsnNode(Opcodes.BIPUSH, 16))
     list.add(
         MethodInsnNode(
             Opcodes.INVOKESTATIC,
@@ -196,7 +205,7 @@ fun generateKeySetter(name: String): MethodNode {
             "([BLjava/lang/String;)V"
         )
     )
-    list.add(FieldInsnNode(Opcodes.PUTSTATIC, hostClassName, keyVarName, "Ljavax/crypto/spec/SecretKeySpec"))
+    list.add(FieldInsnNode(Opcodes.PUTSTATIC, hostClassName, keyVarName, "Ljavax/crypto/spec/SecretKeySpec;"))
     list.add(exEnd)
     list.add(JumpInsnNode(Opcodes.GOTO, labelReturn))
     list.add(exHandler)
