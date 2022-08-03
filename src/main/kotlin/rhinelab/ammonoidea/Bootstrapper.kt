@@ -9,6 +9,7 @@ import rhinelab.ammonoidea.transformer.flow.fakeGoto
 import rhinelab.ammonoidea.transformer.flow.invokeDynamic
 import rhinelab.ammonoidea.transformer.flow.stupidTransformer
 import rhinelab.ammonoidea.transformer.flow.switchMangler
+import rhinelab.ammonoidea.transformer.moveInitialization
 import rhinelab.ammonoidea.transformer.numberBitwise
 import rhinelab.ammonoidea.transformer.stringEncryptor
 import java.io.File
@@ -93,6 +94,7 @@ fun process(inFile: File, outFile: File, debug: Boolean = false) {
         }
     }
 
+    moveInitialization.transform()
     numberBitwise.transform()
     invokeDynamic.transform()
     stringEncryptor.transform()
