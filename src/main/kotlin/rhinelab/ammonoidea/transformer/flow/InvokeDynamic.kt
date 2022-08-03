@@ -37,8 +37,8 @@ val invokeDynamic = transformer {
     var bsmName = "InvokeDynamic_Host_" + generateRandomString(4, "ABCDEF1234567890")
     if (!debug) {
         bsmName = generateRandomString(
-        16,
-        "%为国家哪何曾半日闲空 我也曾征过了塞北西东\"官封到节度使皇王恩重{霎时间身不爽瞌睡朦胧*"
+            16,
+            "%为国家哪何曾半日闲空 我也曾征过了塞北西东\"官封到节度使皇王恩重{霎时间身不爽瞌睡朦胧*"
         )
     }
     val bsmHandle = Handle(

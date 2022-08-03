@@ -1,7 +1,7 @@
 package rhinelab.ammonoidea.dictionary
 
 class IlDictionary : IDictionary {
-    var CHARSET = "Il".toCharArray()
+    var CHARSET = "Ili1".toCharArray()
     private val cache: MutableSet<String> = HashSet()
     private var cachedLength = 0
     var length = 8

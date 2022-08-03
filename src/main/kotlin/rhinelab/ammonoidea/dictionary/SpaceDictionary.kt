@@ -12,7 +12,6 @@ class SpaceDictionary : IDictionary {
     private var set = hashSetOf<String>()
     private var alphabet: AlphabetDictionary = AlphabetDictionary()
 
-
     override fun next(): String {
         val random = Random()
         val builder = StringBuilder(5)

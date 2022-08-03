@@ -5,6 +5,7 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.*
 import rhinelab.ammonoidea.Bootstrapper.classes
 import rhinelab.ammonoidea.Bootstrapper.debug
+import rhinelab.ammonoidea.dictionary.UnicodeDictionary
 import rhinelab.ammonoidea.isExcluded
 import rhinelab.ammonoidea.utils.generateRandomString
 import rhinelab.ammonoidea.utils.randomInt
@@ -18,7 +19,7 @@ import kotlin.collections.ArrayList
 
 
 var hostClassName = ""
-var keyVarName = if (!debug) "*".repeat(randomInt(4, 32)) else generateRandomString(12, "ABCDEF1234567890")
+var keyVarName = if (!debug) UnicodeDictionary.next() else generateRandomString(12, "ABCDEF1234567890")
 
 private var secretKey: SecretKeySpec? = null
 
@@ -41,15 +42,17 @@ val stringEncryptor = transformer {
 
     hostClassName = hostClass.name
 
-    val keySetterName = generateRandomString(
-        8,
-        "菊石混淆器=祝您新年快乐阖家幸福|事业蒸蒸日上?生活丰富美满|全家trans\""
-    )
+    val keySetterName =
+        if (debug) "String_KeySetter_" + generateRandomString(4, "ABCDEF1234567890") else generateRandomString(
+            8,
+            "菊石混淆器=祝您新年快乐阖家幸福|事业蒸蒸日上?生活丰富美满|全家trans\""
+        )
 
-    val decryptorName = generateRandomString(
-        12,
-        "菊石混淆器=祝您新年快乐阖家幸福|事业蒸蒸日上?生活丰富美满|全家trans\""
-    )
+    val decryptorName =
+        if (debug) "String_Decrypt_" + generateRandomString(4, "ABCDEF1234567890") else generateRandomString(
+            12,
+            "菊石混淆器=祝您新年快乐阖家幸福|事业蒸蒸日上?生活丰富美满|全家trans\""
+        )
 
     classes.forEach { classNode ->
         if (isExcluded(classNode)) {

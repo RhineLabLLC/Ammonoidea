@@ -75,8 +75,6 @@ fun modifyInt(num: Int): InsnList {
                 cur and opr
             }
         }
-
-
     }
 
     val n = num xor cur

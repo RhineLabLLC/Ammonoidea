@@ -1,9 +1,10 @@
 package rhinelab.ammonoidea.dictionary
 
-class UnicodeDictionary : IDictionary {
+object UnicodeDictionary : IDictionary {
+    private val CHARSET = "\u00c3\u00c9\u0152\u017d\u00adAEi".toCharArray()
     private val cache: MutableSet<String> = HashSet()
     private var cachedLength = 0
-    var length = 4
+    var length = 8
     override fun next(): String {
         if (cachedLength > length) length = cachedLength
         var count = 0
@@ -31,7 +32,4 @@ class UnicodeDictionary : IDictionary {
         return String(c)
     }
 
-    companion object {
-        private val CHARSET = "\u00c3\u00c9\u0152\u017d\u00adAEi".toCharArray()
-    }
 }

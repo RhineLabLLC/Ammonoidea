@@ -1,0 +1,59 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id "org.jetbrains.kotlin.jvm" version "1.7.10"
+    id 'java'
+    id 'idea'
+}
+version = 'git rev-parse --short HEAD'.execute().text.trim()
+
+def outputJar = "${buildDir}/libs/${version}.jar"
+def dependsDir = "${buildDir}/libs/dependencies/"
+
+sourceCompatibility = targetCompatibility = '1.8'
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'rhinelab.ammonoidea.BootstrapperKt'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'org.ow2.asm', name: 'asm', version: '9.3'
+    implementation group: 'org.ow2.asm', name: 'asm-tree', version: '9.3'
+    implementation group: 'org.ow2.asm', name: 'asm-commons', version: '9.3'
+}
+
+shadowJar {
+    classifier null
+}
+
+task copyDepends(type: Copy) {
+    from configurations.default
+    into "${dependsDir}"
+}
+
+assemble {
+    dependsOn shadowJar
+}
+
+task generateArtifact {
+    dependsOn assemble
+    dependsOn copyDepends
+}
+
+jar {
+    manifest.attributes([
+            "Main-Class": getProperty('mainClass'),
+            'Implementation-Version': version
+    ])
+}
