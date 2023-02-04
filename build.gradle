@@ -15,7 +15,7 @@ version = 'git rev-parse --short HEAD'.execute().text.trim()
 def outputJar = "${buildDir}/libs/${version}.jar"
 def dependsDir = "${buildDir}/libs/dependencies/"
 
-sourceCompatibility = targetCompatibility = '1.8'
+sourceCompatibility = targetCompatibility = '11'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 if (!hasProperty('mainClass')) {

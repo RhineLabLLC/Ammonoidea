@@ -1,14 +1,14 @@
 package rhinelab.ammonoidea.dictionary
 
 object UnicodeDictionary : IDictionary {
-    private val CHARSET = "\u00c3\u00c9\u0152\u017d\u00adAEi".toCharArray()
+    private val CHARSET = "\u00c3\u00c9\u0152\u017d\u00ad\uccccAEi".toCharArray()
     private val cache: MutableSet<String> = HashSet()
     private var cachedLength = 0
     var length = 8
     override fun next(): String {
         if (cachedLength > length) length = cachedLength
         var count = 0
-        val arrLen = CHARSET.size
+        val arrLen = CHARSET.size - 1
         var s: String
         do {
             s = randomString(length)
@@ -28,7 +28,7 @@ object UnicodeDictionary : IDictionary {
 
     fun randomString(length: Int): String {
         val c = CharArray(length)
-        for (i in 0 until length) c[i] = CHARSET[(0..CHARSET.size).random()]
+        for (i in 0 until length) c[i] = CHARSET[(CHARSET.indices).random()]
         return String(c)
     }
 

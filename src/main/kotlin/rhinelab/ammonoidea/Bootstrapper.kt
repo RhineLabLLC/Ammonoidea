@@ -56,7 +56,8 @@ fun processSingleClass(byteArray: ByteArray, debug: Boolean = false) {
     cn = classes.first()
 
     val cw = ClassWriter(
-        if (debug) ClassWriter.COMPUTE_MAXS else ClassWriter.COMPUTE_FRAMES
+        // if (debug) ClassWriter.COMPUTE_MAXS else ClassWriter.COMPUTE_FRAMES
+        ClassWriter.COMPUTE_MAXS
     )
 
     cn.accept(cw)
@@ -128,5 +129,5 @@ fun process(inFile: File, outFile: File, debug: Boolean = false) {
 
 fun isExcluded(classNode: ClassNode): Boolean {
     if (Modifier.isInterface(classNode.access)) return true
-    return !classNode.name.contains("neptunex")
+    return false
 }
