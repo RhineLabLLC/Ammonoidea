@@ -1,5 +1,6 @@
 package rhinelab.ammonoidea
 
+import SafeClassWriter
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.tree.ClassNode
@@ -48,16 +49,15 @@ fun processSingleClass(byteArray: ByteArray, debug: Boolean = false) {
     cl.accept(cn, ClassReader.SKIP_DEBUG)
     classes.add(cn)
     numberBitwise.transform()
-    invokeDynamic.transform()
+    // invokeDynamic.transform()
     switchMangler.transform()
     stupidTransformer.transform()
     fakeGoto.transform()
     // invisibleCast.transform()
     cn = classes.first()
 
-    val cw = ClassWriter(
-        // if (debug) ClassWriter.COMPUTE_MAXS else ClassWriter.COMPUTE_FRAMES
-        ClassWriter.COMPUTE_MAXS
+    val cw = SafeClassWriter(
+        null, null, 0
     )
 
     cn.accept(cw)
@@ -106,9 +106,9 @@ fun process(inFile: File, outFile: File, debug: Boolean = false) {
     JarOutputStream(outFile.outputStream()).use {
         classes.forEach { classNode ->
             val cw: ClassWriter = if (debug) {
-                ClassWriter(ClassWriter.COMPUTE_MAXS)
+                SafeClassWriter(null, null, ClassWriter.COMPUTE_MAXS)
             } else {
-                ClassWriter(ClassWriter.COMPUTE_FRAMES)
+                SafeClassWriter(null, null, ClassWriter.COMPUTE_FRAMES)
             }
 
             val entry = JarEntry("${classNode.name}.class")

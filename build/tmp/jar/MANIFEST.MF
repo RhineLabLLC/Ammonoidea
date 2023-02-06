@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: rhinelab.ammonoidea.BootstrapperKt
+Implementation-Version: 517c6b8
+
